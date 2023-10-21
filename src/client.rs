@@ -16,3 +16,23 @@
 //! Interaction Between Components:
 
 
+use tokio::net::TcpStream;
+use tokio::io::{self, AsyncReadExt, AsyncWriteExt};
+
+pub async fn run_client() -> io::Result<()> {
+    // Connect to the server
+    let mut stream = TcpStream::connect("127.0.0.1:8080").await?;
+    println!("Connected to the server!");
+
+    // Sending a message
+    let message = b"Hello, server!";
+    stream.write_all(message).await?;
+
+    // Receiving a response
+    let mut buf = [0; 1024];
+    let n = stream.read(&mut buf).await?;
+    let response = String::from_utf8_lossy(&buf[0..n]);
+    println!("Received: {}", response);
+
+    Ok(())
+}

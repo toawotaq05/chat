@@ -8,12 +8,30 @@
 //! Error Handling and Logging:
 //! 
 //! Handle any global errors and potentially set up logging configurations for the entire application.
-mod server;
 mod client;
+mod server;
+use std::env;
 
 #[tokio::main]
 async fn main() {
-    if let Err(e) = server::run_server().await {
-        eprintln!("Server error: {}", e);
+
+    let args: Vec<String> = env::args().collect();
+
+    match args.get(1) {
+        Some(arg) if arg == "server" => {
+            // Run the server
+            if let Err(e) = server::run_server().await {
+                eprintln!("Server error: {}", e);
+            }
+        }
+        Some(arg) if arg == "client" => {
+            // Run the client
+            if let Err(e) = client::run_client().await {
+                eprintln!("Client error: {}", e);
+            }
+        }
+        _ => {
+            eprintln!("Usage: {} [server|client]", args[0]);
+        }
     }
 }
